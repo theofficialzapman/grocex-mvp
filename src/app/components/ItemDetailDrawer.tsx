@@ -1,0 +1,202 @@
+import { useState } from 'react';
+import { X, MoveRight, Tag, Gift, Trash2 } from 'lucide-react';
+import { Item, Task, ActionType } from '../types';
+import { useData } from '../context/DataContext';
+import { StatusBadge } from './StatusBadge';
+import { getRiskExplanation } from '../utils/scoring';
+import { toast } from 'sonner';
+
+interface ItemDetailDrawerProps {
+  item: Item | null;
+  onClose: () => void;
+}
+
+export function ItemDetailDrawer({ item, onClose }: ItemDetailDrawerProps) {
+  const { addTask } = useData();
+  const [assignee, setAssignee] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [notes, setNotes] = useState('');
+  const [selectedAction, setSelectedAction] = useState<ActionType | null>(null);
+
+  if (!item) return null;
+
+  const handleCreateTask = () => {
+    if (!selectedAction) {
+      toast.error('Please select an action');
+      return;
+    }
+
+    const task: Task = {
+      id: `t${Date.now()}`,
+      itemId: item.id,
+      itemName: item.name,
+      action: selectedAction,
+      assignee: assignee || undefined,
+      dueDate: dueDate || new Date().toISOString().split('T')[0],
+      notes: notes || undefined,
+      completed: false,
+      createdAt: new Date().toISOString(),
+    };
+
+    addTask(task);
+    toast.success(`Task created for ${item.name}`);
+    setAssignee('');
+    setDueDate('');
+    setNotes('');
+    setSelectedAction(null);
+    onClose();
+  };
+
+  const riskExplanation = getRiskExplanation(
+    item.daysToExpiry,
+    item.category,
+    item.movementPerDay,
+    item.quantity
+  );
+
+  const actions: { type: ActionType; label: string; icon: typeof MoveRight; color: string }[] = [
+    { type: 'move-to-front', label: 'Move to Front', icon: MoveRight, color: 'bg-blue-50 hover:bg-blue-100 border-blue-200' },
+    { type: 'markdown', label: 'Markdown Suggestion', icon: Tag, color: 'bg-purple-50 hover:bg-purple-100 border-purple-200' },
+    { type: 'donate', label: 'Donate/Repurpose', icon: Gift, color: 'bg-green-50 hover:bg-green-100 border-green-200' },
+    { type: 'dispose', label: 'Dispose', icon: Trash2, color: 'bg-red-50 hover:bg-red-100 border-red-200' },
+  ];
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
+      <div className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl z-50 overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
+          <h2 className="text-2xl font-semibold text-gray-900">Item Details</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X className="w-6 h-6 text-gray-500" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-6">
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">{item.name}</h3>
+            <div className="flex items-center gap-3">
+              <StatusBadge status={item.status} />
+              <span className="text-sm text-gray-600">Risk Score: {item.riskScore}/100</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Category</p>
+              <p className="text-gray-900 font-medium">{item.category}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Quantity</p>
+              <p className="text-gray-900 font-medium">{item.quantity} units</p>
+            </div>
+            {item.sku && (
+              <div>
+                <p className="text-sm text-gray-500 mb-1">SKU</p>
+                <p className="text-gray-900 font-medium">{item.sku}</p>
+              </div>
+            )}
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Days to Expiry</p>
+              <p className="text-gray-900 font-medium">{item.daysToExpiry} days</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Expiry Date</p>
+              <p className="text-gray-900 font-medium">{new Date(item.expiryDate).toLocaleDateString()}</p>
+            </div>
+            {item.movementPerDay !== undefined && (
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Movement</p>
+                <p className="text-gray-900 font-medium">{item.movementPerDay.toFixed(1)} units/day</p>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="font-medium text-gray-900 mb-2">Risk Analysis</h4>
+            <p className="text-sm text-gray-700">{riskExplanation}</p>
+          </div>
+
+          <div className="bg-blue-50 rounded-lg p-4">
+            <h4 className="font-medium text-gray-900 mb-2">Recommended Action</h4>
+            <p className="text-sm text-gray-700">{item.recommendedAction}</p>
+          </div>
+
+          <div className="border-t border-gray-200 pt-6">
+            <h4 className="font-semibold text-gray-900 mb-4">Create Task</h4>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Action</label>
+              <div className="grid grid-cols-2 gap-3">
+                {actions.map((action) => (
+                  <button
+                    key={action.type}
+                    onClick={() => setSelectedAction(action.type)}
+                    className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-all ${
+                      selectedAction === action.type
+                        ? 'border-green-500 bg-green-50'
+                        : action.color
+                    }`}
+                  >
+                    <action.icon className="w-5 h-5" />
+                    <span className="text-sm font-medium">{action.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Assignee (optional)
+                </label>
+                <input
+                  type="text"
+                  value={assignee}
+                  onChange={(e) => setAssignee(e.target.value)}
+                  placeholder="Staff name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Due Date
+                </label>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Notes (optional)
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={3}
+                  placeholder="Additional instructions..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+
+              <button
+                onClick={handleCreateTask}
+                className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
+              >
+                Create Task
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
