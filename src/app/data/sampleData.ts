@@ -48,21 +48,28 @@ function createItem(
 }
 
 export const sampleItems: Item[] = [
-  createItem('1', 'Organic Strawberries', 'Produce', 24, 1, { sku: 'PRD-001', receivedDaysAgo: 4, movementPerDay: 3.2 }),
-  createItem('2', 'Whole Milk (1 Gallon)', 'Dairy', 18, 2, { sku: 'DRY-023', receivedDaysAgo: 10, movementPerDay: 5.1 }),
-  createItem('3', 'Fresh Ground Beef', 'Meat', 12, 1, { sku: 'MT-045', receivedDaysAgo: 2, movementPerDay: 2.8 }),
-  createItem('4', 'Spinach Bunch', 'Produce', 30, 3, { sku: 'PRD-089', receivedDaysAgo: 2, movementPerDay: 4.5 }),
-  createItem('5', 'Greek Yogurt 4-pack', 'Dairy', 36, 6, { sku: 'DRY-102', receivedDaysAgo: 5, movementPerDay: 6.2 }),
-  createItem('6', 'Artisan Sourdough', 'Bakery', 8, 2, { sku: 'BKY-012', receivedDaysAgo: 1, movementPerDay: 1.5 }),
-  createItem('7', 'Cherry Tomatoes', 'Produce', 20, 4, { sku: 'PRD-034', receivedDaysAgo: 3, movementPerDay: 3.8 }),
-  createItem('8', 'Salmon Fillets', 'Meat', 10, 2, { sku: 'MT-078', receivedDaysAgo: 2, movementPerDay: 2.1 }),
-  createItem('9', 'Blueberries', 'Produce', 15, 5, { sku: 'PRD-056', receivedDaysAgo: 2, movementPerDay: 2.9 }),
-  createItem('10', 'Mozzarella Cheese', 'Dairy', 22, 9, { sku: 'DRY-145', receivedDaysAgo: 6, movementPerDay: 4.3 }),
-  createItem('11', 'Romaine Lettuce', 'Produce', 28, 3, { sku: 'PRD-067', receivedDaysAgo: 2, movementPerDay: 5.6 }),
-  createItem('12', 'Croissants 6-pack', 'Bakery', 12, 3, { sku: 'BKY-034', receivedDaysAgo: 1, movementPerDay: 2.4 }),
-  createItem('13', 'Chicken Breast', 'Meat', 16, 4, { sku: 'MT-023', receivedDaysAgo: 2, movementPerDay: 4.2 }),
-  createItem('14', 'Avocados', 'Produce', 40, 2, { sku: 'PRD-012', receivedDaysAgo: 4, movementPerDay: 7.8 }),
-  createItem('15', 'Cheddar Cheese Block', 'Dairy', 14, 14, { sku: 'DRY-089', receivedDaysAgo: 14, movementPerDay: 3.1 }),
+  // Red — expiring in 1-2 days, high risk
+  createItem('1', 'Organic Strawberries', 'Produce', 24, 2, { sku: 'PRD-001', receivedDaysAgo: 5, movementPerDay: 3.2 }),
+  createItem('3', 'Fresh Ground Beef', 'Meat', 12, 2, { sku: 'MT-045', receivedDaysAgo: 3, movementPerDay: 2.8 }),
+  createItem('6', 'Artisan Sourdough', 'Bakery', 8, 3, { sku: 'BKY-012', receivedDaysAgo: 2, movementPerDay: 1.5 }),
+
+  // Orange — expiring in 4-6 days, medium-high risk
+  createItem('2', 'Whole Milk (1 Gallon)', 'Dairy', 18, 4, { sku: 'DRY-023', receivedDaysAgo: 10, movementPerDay: 5.1 }),
+  createItem('8', 'Salmon Fillets', 'Meat', 10, 4, { sku: 'MT-078', receivedDaysAgo: 3, movementPerDay: 2.1 }),
+  createItem('4', 'Spinach Bunch', 'Produce', 30, 5, { sku: 'PRD-089', receivedDaysAgo: 3, movementPerDay: 4.5 }),
+  createItem('14', 'Avocados', 'Produce', 40, 5, { sku: 'PRD-012', receivedDaysAgo: 5, movementPerDay: 7.8 }),
+
+  // Yellow — expiring in 7-12 days, moderate risk
+  createItem('5', 'Greek Yogurt 4-pack', 'Dairy', 36, 8, { sku: 'DRY-102', receivedDaysAgo: 6, movementPerDay: 6.2 }),
+  createItem('7', 'Cherry Tomatoes', 'Produce', 20, 9, { sku: 'PRD-034', receivedDaysAgo: 4, movementPerDay: 3.8 }),
+  createItem('9', 'Blueberries', 'Produce', 15, 10, { sku: 'PRD-056', receivedDaysAgo: 3, movementPerDay: 2.9 }),
+  createItem('11', 'Romaine Lettuce', 'Produce', 28, 10, { sku: 'PRD-067', receivedDaysAgo: 3, movementPerDay: 5.6 }),
+  createItem('12', 'Croissants 6-pack', 'Bakery', 12, 11, { sku: 'BKY-034', receivedDaysAgo: 2, movementPerDay: 2.4 }),
+
+  // Green — expiring in 15+ days, low risk
+  createItem('10', 'Mozzarella Cheese', 'Dairy', 22, 16, { sku: 'DRY-145', receivedDaysAgo: 7, movementPerDay: 4.3 }),
+  createItem('13', 'Chicken Breast', 'Meat', 16, 18, { sku: 'MT-023', receivedDaysAgo: 3, movementPerDay: 4.2 }),
+  createItem('15', 'Cheddar Cheese Block', 'Dairy', 14, 21, { sku: 'DRY-089', receivedDaysAgo: 14, movementPerDay: 3.1 }),
 ];
 
 export const sampleTasks: Task[] = [
