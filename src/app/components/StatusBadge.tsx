@@ -1,7 +1,7 @@
 import { ItemStatus } from '../types';
 
 const statusConfig: Record<ItemStatus, { bg: string; text: string; label: string }> = {
-  red: { bg: 'bg-red-100', text: 'text-red-700', label: 'Expired/Urgent' },
+  red: { bg: 'bg-red-100', text: 'text-red-700', label: 'Urgent' },
   orange: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'At Risk' },
   yellow: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Warning' },
   green: { bg: 'bg-green-100', text: 'text-green-700', label: 'Good' },
