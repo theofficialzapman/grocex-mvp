@@ -3,7 +3,7 @@ import { useData } from '../context/DataContext';
 import { Item, ItemStatus } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { ItemDetailDrawer } from '../components/ItemDetailDrawer';
-import { Package, AlertTriangle, XCircle, ClipboardList, DollarSign } from 'lucide-react';
+import { Package, AlertTriangle, XCircle, ClipboardList, DollarSign, Search, X } from 'lucide-react';
 
 export default function Dashboard() {
   const { items, tasks } = useData();
@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [expiryFilter, setExpiryFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'risk' | 'expiry'>('risk');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const atRiskItems = items.filter((item) => item.riskScore >= 60);
   const expiredItems = items.filter((item) => item.daysToExpiry <= 0);
@@ -29,6 +30,15 @@ export default function Dashboard() {
 
   const filteredItems = useMemo(() => {
     let filtered = [...items];
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      filtered = filtered.filter((item) =>
+        item.name.toLowerCase().includes(q) ||
+        item.category.toLowerCase().includes(q) ||
+        (item.sku && item.sku.toLowerCase().includes(q))
+      );
+    }
 
     if (statusFilter !== 'all') {
       filtered = filtered.filter((item) => item.status === statusFilter);
@@ -56,7 +66,7 @@ export default function Dashboard() {
     });
 
     return filtered;
-  }, [items, statusFilter, categoryFilter, expiryFilter, sortBy]);
+  }, [items, searchQuery, statusFilter, categoryFilter, expiryFilter, sortBy]);
 
   return (
     <div className="p-8">
@@ -131,6 +141,25 @@ export default function Dashboard() {
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">At-Risk Items</h2>
 
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by item name, category or SKU..."
+              className="w-full pl-9 pr-9 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
           <div className="flex flex-wrap gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
@@ -140,7 +169,7 @@ export default function Dashboard() {
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="all">All</option>
-                <option value="red">Expired/Urgent</option>
+                <option value="red">Urgent</option>
                 <option value="orange">At Risk</option>
                 <option value="yellow">Warning</option>
                 <option value="green">Good</option>
