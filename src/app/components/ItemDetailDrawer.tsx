@@ -12,13 +12,31 @@ interface ItemDetailDrawerProps {
 }
 
 export function ItemDetailDrawer({ item, onClose }: ItemDetailDrawerProps) {
-  const { addTask } = useData();
+  const { addTask, staff } = useData();
   const [assignee, setAssignee] = useState('');
+  const [assigneeEmail, setAssigneeEmail] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
   const [selectedAction, setSelectedAction] = useState<ActionType | null>(null);
 
   if (!item) return null;
+
+  const handleStaffSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+      setAssignee('');
+      setAssigneeEmail('');
+    } else if (value === '__manual__') {
+      setAssignee('');
+      setAssigneeEmail('');
+    } else {
+      const member = staff.find(m => m.id === value);
+      if (member) {
+        setAssignee(member.name);
+        setAssigneeEmail(member.email);
+      }
+    }
+  };
 
   const handleCreateTask = () => {
     if (!selectedAction) {
@@ -32,6 +50,7 @@ export function ItemDetailDrawer({ item, onClose }: ItemDetailDrawerProps) {
       itemName: item.name,
       action: selectedAction,
       assignee: assignee || undefined,
+      assigneeEmail: assigneeEmail || undefined,
       dueDate: dueDate || new Date().toISOString().split('T')[0],
       notes: notes || undefined,
       completed: false,
@@ -41,6 +60,7 @@ export function ItemDetailDrawer({ item, onClose }: ItemDetailDrawerProps) {
     addTask(task);
     toast.success(`Task created for ${item.name}`);
     setAssignee('');
+    setAssigneeEmail('');
     setDueDate('');
     setNotes('');
     setSelectedAction(null);
@@ -153,11 +173,40 @@ export function ItemDetailDrawer({ item, onClose }: ItemDetailDrawerProps) {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Assignee (optional)
                 </label>
+                {staff.length > 0 ? (
+                  <select
+                    onChange={handleStaffSelect}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">Select staff member...</option>
+                    {staff.map(m => (
+                      <option key={m.id} value={m.id}>{m.name} ({m.email})</option>
+                    ))}
+                    <option value="__manual__">Type manually...</option>
+                  </select>
+                ) : (
+                  <p className="text-xs text-gray-500 mb-2">No staff added yet. Add staff in Settings or type a name below.</p>
+                )}
+                {(staff.length === 0 || assignee === '') && (
+                  <input
+                    type="text"
+                    value={assignee}
+                    onChange={(e) => setAssignee(e.target.value)}
+                    placeholder="Staff name"
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Assignee Email (optional)
+                </label>
                 <input
-                  type="text"
-                  value={assignee}
-                  onChange={(e) => setAssignee(e.target.value)}
-                  placeholder="Staff name"
+                  type="email"
+                  value={assigneeEmail}
+                  onChange={(e) => setAssigneeEmail(e.target.value)}
+                  placeholder="staff@store.com"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
@@ -200,3 +249,5 @@ export function ItemDetailDrawer({ item, onClose }: ItemDetailDrawerProps) {
     </>
   );
 }
+
+

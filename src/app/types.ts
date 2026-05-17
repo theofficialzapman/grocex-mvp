@@ -2,6 +2,12 @@ export type ItemStatus = 'green' | 'yellow' | 'orange' | 'red' | 'blue';
 export type ActionType = 'move-to-front' | 'markdown' | 'donate' | 'dispose';
 export type Category = 'Produce' | 'Dairy' | 'Meat' | 'Bakery' | 'Canned' | 'Frozen' | 'Other';
 
+export interface StaffMember {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export interface Item {
   id: string;
   name: string;
@@ -23,6 +29,7 @@ export interface Task {
   itemName: string;
   action: ActionType;
   assignee?: string;
+  assigneeEmail?: string;
   dueDate: string;
   notes?: string;
   completed: boolean;

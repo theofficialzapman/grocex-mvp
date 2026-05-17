@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
-import { Item, Task, UploadStatus } from '../types';
+import { Item, Task, UploadStatus, StaffMember } from '../types';
 import { sampleItems, sampleTasks } from '../data/sampleData';
 
 // --- localStorage helpers ---
@@ -9,6 +9,7 @@ const KEYS = {
   UPLOAD_STATUS: 'grocex_upload_status',
   IS_DEMO: 'grocex_is_demo',
   USER_CLEARED: 'grocex_user_cleared',
+  STAFF: 'grocex_staff',
 };
 
 function load<T>(key: string, fallback: T): T {
@@ -61,6 +62,7 @@ interface DataContextType {
   tasks: Task[];
   uploadStatus: UploadStatus;
   isDemoMode: boolean;
+  staff: StaffMember[];
   addItem: (item: Item) => void;
   addItems: (items: Item[]) => void;
   updateItem: (id: string, updates: Partial<Item>) => void;
@@ -71,6 +73,8 @@ interface DataContextType {
   loadDemoData: () => void;
   updateUploadStatus: (key: keyof UploadStatus, status: UploadStatus[keyof UploadStatus]) => void;
   clearAllData: () => void;
+  addStaff: (member: StaffMember) => void;
+  removeStaff: (id: string) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -81,6 +85,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>(initial.current.tasks);
   const [isDemoMode, setIsDemoMode] = useState<boolean>(initial.current.isDemoMode);
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>(initial.current.uploadStatus);
+  const [staff, setStaff] = useState<StaffMember[]>(() => load<StaffMember[]>(KEYS.STAFF, []));
 
   // Persist whenever state changes (skip very first render — already saved in initState)
   const mounted = useRef(false);
@@ -103,6 +108,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     if (!mounted.current) return;
     save(KEYS.UPLOAD_STATUS, uploadStatus);
   }, [uploadStatus]);
+
+  useEffect(() => {
+    save(KEYS.STAFF, staff);
+  }, [staff]);
+
+  const addStaff = useCallback((member: StaffMember) => {
+    setStaff(prev => [...prev, member]);
+  }, []);
+
+  const removeStaff = useCallback((id: string) => {
+    setStaff(prev => prev.filter(m => m.id !== id));
+  }, []);
 
   const loadDemoData = useCallback(() => {
     const fresh = sampleItems; // recompute relative dates
@@ -171,6 +188,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         tasks,
         uploadStatus,
         isDemoMode,
+        staff,
         addItem,
         addItems,
         updateItem,
@@ -181,6 +199,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         loadDemoData,
         updateUploadStatus,
         clearAllData,
+        addStaff,
+        removeStaff,
       }}
     >
       {children}
