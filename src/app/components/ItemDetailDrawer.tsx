@@ -4,6 +4,7 @@ import { Item, Task, ActionType } from '../types';
 import { useData } from '../context/DataContext';
 import { StatusBadge } from './StatusBadge';
 import { getRiskExplanation } from '../utils/scoring';
+import { sendTaskAssignmentEmail } from '../utils/emailUtils';
 import { toast } from 'sonner';
 
 interface ItemDetailDrawerProps {
@@ -58,7 +59,23 @@ export function ItemDetailDrawer({ item, onClose }: ItemDetailDrawerProps) {
     };
 
     addTask(task);
-    toast.success(`Task created for ${item.name}`);
+
+    if (assigneeEmail) {
+      sendTaskAssignmentEmail({
+        assignee_name: assignee || 'Team Member',
+        assignee_email: assigneeEmail,
+        task_item: item.name,
+        task_action: selectedAction.replace(/-/g, ' '),
+        task_due_date: task.dueDate,
+        task_notes: notes || '',
+        store_name: 'Grocex Store',
+      }).then(sent => {
+        if (sent) toast.success(`Task created and email sent to ${assigneeEmail}`);
+        else toast.success(`Task created for ${item.name}`);
+      });
+    } else {
+      toast.success(`Task created for ${item.name}`);
+    }
     setAssignee('');
     setAssigneeEmail('');
     setDueDate('');

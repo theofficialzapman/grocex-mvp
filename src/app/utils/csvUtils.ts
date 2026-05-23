@@ -307,13 +307,14 @@ export function exportWeeklyReportCSV(items: Item[], tasks: Task[]): string {
 
   // Tasks detail
   lines.push('TASKS DETAIL');
-  const taskHeader = ['Item Name', 'Action', 'Assignee', 'Due Date', 'Completed', 'Completed At', 'Notes'];
+  const taskHeader = ['Item Name', 'Action', 'Assignee', 'Assignee Email', 'Due Date', 'Completed', 'Completed At', 'Notes'];
   lines.push(taskHeader.map(e).join(','));
   tasks.forEach(task => {
     lines.push([
       task.itemName,
       task.action,
       task.assignee || '',
+      task.assigneeEmail || '',
       task.dueDate,
       task.completed ? 'Yes' : 'No',
       task.completedAt || '',
