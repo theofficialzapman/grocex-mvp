@@ -29,6 +29,7 @@ export interface Task {
   itemName: string;
   action: ActionType;
   assignee?: string;
+  assigneeId?: string;
   assigneeEmail?: string;
   dueDate: string;
   notes?: string;

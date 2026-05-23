@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Outlet, NavLink } from 'react-router';
-import { LayoutDashboard, PlusCircle, Upload, ClipboardList, BarChart3, Settings, Menu, X } from 'lucide-react';
+import { Outlet, NavLink, useNavigate } from 'react-router';
+import { LayoutDashboard, PlusCircle, Upload, ClipboardList, BarChart3, Settings, Menu, X, Users, LogOut } from 'lucide-react';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 
 const navItems = [
   { to: '/app/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -9,12 +10,20 @@ const navItems = [
   { to: '/app/upload-data', icon: Upload, label: 'Upload Data' },
   { to: '/app/tasks', icon: ClipboardList, label: 'Tasks' },
   { to: '/app/weekly-report', icon: BarChart3, label: 'Weekly Report' },
+  { to: '/app/teams', icon: Users, label: 'Teams' },
   { to: '/app/settings', icon: Settings, label: 'Settings' },
 ];
 
 export default function MainLayout() {
   const { isDemoMode } = useData();
+  const { profile, signOut } = useAuth();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
 
   const SidebarContent = () => (
     <>
@@ -65,6 +74,21 @@ export default function MainLayout() {
           </p>
         </div>
       )}
+      <div className="p-4 border-t border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-gray-900 truncate">{profile?.name}</p>
+            <p className="text-xs text-gray-500 truncate">{profile?.email}</p>
+          </div>
+          <button
+            onClick={handleSignOut}
+            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-2"
+            title="Sign out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
     </>
   );
 
