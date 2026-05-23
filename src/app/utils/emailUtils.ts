@@ -1,7 +1,7 @@
 import emailjs from '@emailjs/browser';
 
 const SERVICE_ID = 'service_i8xrzcs';
-const TEMPLATE_ID = 'template_tbtml7d';
+const TEMPLATE_ID = 'template_z6aa8y8';
 const PUBLIC_KEY = 'Ri3hxSU2HegLFYmPw';
 
 export interface TaskEmailParams {
