@@ -55,13 +55,13 @@ const fromDbItem = (row: Record<string, unknown>): Item => ({
   category: row.category as string,
   quantity: row.quantity as number,
   expiryDate: row.expiry_date as string,
-  daysToExpiry: row.days_to_expiry as number,
-  riskScore: row.risk_score as number,
+  daysToExpiry: row.days_to_expiry as number ?? 0,
+  riskScore: row.risk_score as number ?? 0,
   status: row.status as Item['status'],
-  sku: row.sku as string | undefined,
-  receivedDate: row.received_date as string | undefined,
-  movementPerDay: row.movement_per_day as number | undefined,
-  recommendedAction: row.recommended_action as string,
+  sku: row.sku != null ? row.sku as string : undefined,
+  receivedDate: row.received_date != null ? row.received_date as string : undefined,
+  movementPerDay: row.movement_per_day != null ? row.movement_per_day as number : undefined,
+  recommendedAction: row.recommended_action as string ?? '',
 });
 
 const toDbTask = (task: Task) => ({

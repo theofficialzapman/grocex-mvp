@@ -44,6 +44,30 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: profileError.message });
     }
 
+    // Send welcome email via EmailJS
+    try {
+      await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_id: 'service_i8xrzcs',
+          template_id: 'template_z6aa8y8',
+          user_id: 'Ri3hxSU2HegLFYmPw',
+          template_params: {
+            assignee_name: name,
+            assignee_email: email,
+            task_item: 'Welcome to Grocex',
+            task_action: `Your login email is: ${email} — Your temporary password is: ${password}`,
+            task_due_date: 'Please log in and change your password immediately.',
+            task_notes: 'Visit grocex-mvp.vercel.app/login to get started.',
+            store_name: 'Grocex Admin',
+          },
+        }),
+      });
+    } catch {
+      // Email failed but user was created — not a blocker
+    }
+
     return res.status(200).json({ success: true, userId: user.id });
   } catch (err) {
     return res.status(500).json({ error: 'Internal server error' });
