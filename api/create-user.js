@@ -51,7 +51,7 @@ export default async function handler(req, res) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           service_id: 'service_i8xrzcs',
-          template_id: 'template_hxsj8ol',
+          template_id: 'template_4h2inz2',
           user_id: 'Ri3hxSU2HegLFYmPw',
           template_params: {
             staff_name: name,
