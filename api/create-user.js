@@ -51,16 +51,12 @@ export default async function handler(req, res) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           service_id: 'service_i8xrzcs',
-          template_id: 'template_z6aa8y8',
+          template_id: 'template_hxsj8ol',
           user_id: 'Ri3hxSU2HegLFYmPw',
           template_params: {
-            assignee_name: name,
-            assignee_email: email,
-            task_item: 'Welcome to Grocex',
-            task_action: `Your login email is: ${email} — Your temporary password is: ${password}`,
-            task_due_date: 'Please log in and change your password immediately.',
-            task_notes: 'Visit grocex-mvp.vercel.app/login to get started.',
-            store_name: 'Grocex Admin',
+            staff_name: name,
+            staff_email: email,
+            temp_password: password,
           },
         }),
       });
