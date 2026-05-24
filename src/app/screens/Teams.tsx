@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { useData } from '../context/DataContext';
-import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
-import { UserPlus, X, Mail, User } from 'lucide-react';
+import { UserPlus, X, Mail, User, Eye, EyeOff } from 'lucide-react';
 import { StaffMember } from '../types';
 
 export default function Teams() {
   const { staff, addStaff, removeStaff } = useData();
-  const { profile } = useAuth();
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleAddStaff = async () => {
@@ -31,16 +29,26 @@ export default function Teams() {
 
     setLoading(true);
     try {
-      // Create Supabase auth user
-      const { data, error } = await supabase.auth.admin
-        ? { data: null, error: { message: 'Use service role' } }
-        : await supabase.functions.invoke('create-user', {
-            body: { email: newEmail.trim(), password: newPassword, name: newName.trim() }
-          });
+      const response = await fetch('/api/create-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newName.trim(),
+          email: newEmail.trim(),
+          password: newPassword,
+        }),
+      });
 
-      // Fallback: just save to staff list (auth creation needs service role key on backend)
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast.error(result.error || 'Failed to create account');
+        setLoading(false);
+        return;
+      }
+
       const member: StaffMember = {
-        id: `staff_${Date.now()}`,
+        id: result.userId,
         name: newName.trim(),
         email: newEmail.trim(),
       };
@@ -48,7 +56,7 @@ export default function Teams() {
       setNewName('');
       setNewEmail('');
       setNewPassword('');
-      toast.success(`${member.name} added to the team. Share their login credentials with them.`);
+      toast.success(`${member.name} added. They must change their password on first login.`);
     } catch {
       toast.error('Something went wrong. Please try again.');
     }
@@ -63,12 +71,12 @@ export default function Teams() {
       </div>
 
       <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-semibold text-gray-900 mb-1 flex items-center gap-2">
           <UserPlus className="w-5 h-5 text-green-600" />
           Add Staff Member
         </h2>
         <p className="text-sm text-gray-500 mb-4">
-          Add a staff member so you can assign tasks to them. They will receive an email when a task is assigned.
+          Staff will be prompted to change their password when they first log in.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
@@ -94,13 +102,22 @@ export default function Teams() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Temporary Password</label>
-            <input
-              type="text"
-              value={newPassword}
-              onChange={e => setNewPassword(e.target.value)}
-              placeholder="Min 6 characters"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                placeholder="Min 6 characters"
+                className="w-full px-3 py-2 pr-9 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -109,7 +126,7 @@ export default function Teams() {
           disabled={loading}
           className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50"
         >
-          {loading ? 'Adding...' : 'Add Staff Member'}
+          {loading ? 'Creating account...' : 'Add Staff Member'}
         </button>
       </div>
 

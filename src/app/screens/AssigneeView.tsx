@@ -1,13 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router';
 import { ClipboardList, CheckCircle, Clock, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AssigneeView() {
   const { tasks, updateTask, loading } = useData();
-  const { profile, signOut } = useAuth();
+  const { profile, user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<'open' | 'completed'>('open');
+
+  useEffect(() => {
+    if (user?.user_metadata?.must_change_password) {
+      navigate('/change-password');
+    }
+  }, [user]);
 
   const myTasks = tasks.filter(t =>
     t.assigneeEmail?.toLowerCase() === profile?.email?.toLowerCase() ||

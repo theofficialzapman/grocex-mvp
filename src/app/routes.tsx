@@ -10,6 +10,7 @@ import WeeklyReport from './screens/WeeklyReport';
 import Settings from './screens/Settings';
 import Teams from './screens/Teams';
 import AssigneeView from './screens/AssigneeView';
+import ChangePassword from './screens/ChangePassword';
 import MainLayout from './layouts/MainLayout';
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
@@ -48,5 +49,9 @@ export const router = createBrowserRouter([
   {
     path: '/assignee/tasks',
     element: <AssigneeRoute><AssigneeView /></AssigneeRoute>,
+  },
+  {
+    path: '/change-password',
+    Component: ChangePassword,
   },
 ]);
