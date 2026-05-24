@@ -54,6 +54,7 @@ export default async function handler(req, res) {
           service_id: 'service_i8xrzcs',
           template_id: 'template_4h2inz2',
           user_id: 'Ri3hxSU2HegLFYmPw',
+          accessToken: process.env.EMAILJS_PRIVATE_KEY,
           template_params: {
             staff_name: name,
             staff_email: email,
