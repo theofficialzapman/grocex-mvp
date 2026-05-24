@@ -45,8 +45,9 @@ export default async function handler(req, res) {
     }
 
     // Send welcome email via EmailJS
+    let emailDebug = 'not attempted';
     try {
-      await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      const emailRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -60,11 +61,13 @@ export default async function handler(req, res) {
           },
         }),
       });
-    } catch {
-      // Email failed but user was created — not a blocker
+      const emailText = await emailRes.text();
+      emailDebug = `status=${emailRes.status} body=${emailText}`;
+    } catch (e) {
+      emailDebug = `exception: ${e instanceof Error ? e.message : String(e)}`;
     }
 
-    return res.status(200).json({ success: true, userId: user.id });
+    return res.status(200).json({ success: true, userId: user.id, emailDebug });
   } catch (err) {
     return res.status(500).json({ error: 'Internal server error' });
   }
