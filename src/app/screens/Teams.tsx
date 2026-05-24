@@ -12,6 +12,36 @@ export default function Teams() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
+  const [removing, setRemoving] = useState(false);
+
+  const handleRemoveStaff = async (member: StaffMember) => {
+    if (confirmRemove !== member.id) {
+      setConfirmRemove(member.id);
+      return;
+    }
+    setRemoving(true);
+    try {
+      const response = await fetch('/api/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: member.id }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        toast.error(result.error || 'Failed to remove staff member');
+        setRemoving(false);
+        return;
+      }
+      await removeStaff(member.id);
+      toast.success(`${member.name} removed`);
+      setConfirmRemove(null);
+    } catch {
+      toast.error('Something went wrong. Please try again.');
+    }
+    setRemoving(false);
+  };
+
   const handleAddStaff = async () => {
     if (!newName.trim() || !newEmail.trim() || !newPassword.trim()) {
       toast.error('Please fill in all fields');
@@ -158,10 +188,15 @@ export default function Teams() {
                   </div>
                 </div>
                 <button
-                  onClick={() => { removeStaff(member.id); toast.success(`${member.name} removed`); }}
-                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  onClick={() => handleRemoveStaff(member)}
+                  disabled={removing}
+                  className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
+                    confirmRemove === member.id
+                      ? 'bg-red-500 text-white hover:bg-red-600 px-3 text-xs font-medium'
+                      : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
+                  }`}
                 >
-                  <X className="w-4 h-4" />
+                  {confirmRemove === member.id ? (removing ? 'Removing...' : 'Confirm remove') : <X className="w-4 h-4" />}
                 </button>
               </div>
             ))}
