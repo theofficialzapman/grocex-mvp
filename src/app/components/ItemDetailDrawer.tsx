@@ -91,11 +91,11 @@ export function ItemDetailDrawer({ item, onClose }: ItemDetailDrawerProps) {
     item.quantity
   );
 
-  const actions: { type: ActionType; label: string; icon: typeof MoveRight; color: string }[] = [
-    { type: 'move-to-front', label: 'Move to Front', icon: MoveRight, color: 'bg-blue-50 hover:bg-blue-100 border-blue-200' },
-    { type: 'markdown', label: 'Markdown Suggestion', icon: Tag, color: 'bg-purple-50 hover:bg-purple-100 border-purple-200' },
-    { type: 'donate', label: 'Donate/Repurpose', icon: Gift, color: 'bg-green-50 hover:bg-green-100 border-green-200' },
-    { type: 'dispose', label: 'Dispose', icon: Trash2, color: 'bg-red-50 hover:bg-red-100 border-red-200' },
+  const actions: { type: ActionType; label: string; icon: typeof MoveRight; selectedClass: string; defaultClass: string }[] = [
+    { type: 'move-to-front', label: 'Move to Front', icon: MoveRight, selectedClass: 'bg-blue-500 border-blue-500 text-white', defaultClass: 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700' },
+    { type: 'markdown', label: 'Markdown Suggestion', icon: Tag, selectedClass: 'bg-purple-500 border-purple-500 text-white', defaultClass: 'bg-purple-50 hover:bg-purple-100 border-purple-200 text-purple-700' },
+    { type: 'donate', label: 'Donate/Repurpose', icon: Gift, selectedClass: 'bg-green-500 border-green-500 text-white', defaultClass: 'bg-green-50 hover:bg-green-100 border-green-200 text-green-700' },
+    { type: 'dispose', label: 'Dispose', icon: Trash2, selectedClass: 'bg-red-500 border-red-500 text-white', defaultClass: 'bg-red-50 hover:bg-red-100 border-red-200 text-red-700' },
   ];
 
   return (
@@ -174,8 +174,8 @@ export function ItemDetailDrawer({ item, onClose }: ItemDetailDrawerProps) {
                     onClick={() => setSelectedAction(action.type)}
                     className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-all ${
                       selectedAction === action.type
-                        ? 'border-green-500 bg-green-50'
-                        : action.color
+                        ? action.selectedClass
+                        : action.defaultClass
                     }`}
                   >
                     <action.icon className="w-5 h-5" />
