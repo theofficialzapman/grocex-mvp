@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import { ActionType } from '../types';
-import { MoveRight, Tag, Gift, Trash2, Check } from 'lucide-react';
+import { MoveRight, Tag, Gift, Trash2, Check, ClipboardList } from 'lucide-react';
 import { toast } from 'sonner';
 
 const actionConfig: Record<ActionType, { label: string; icon: typeof MoveRight; color: string }> = {
@@ -107,7 +107,11 @@ export default function Tasks() {
           ) : (
             <div className="space-y-4">
               {filteredTasks.map((task) => {
-                const config = actionConfig[task.action];
+                const config = actionConfig[task.action] || {
+                  label: task.action || 'Task',
+                  icon: ClipboardList,
+                  color: 'bg-gray-100 text-gray-700',
+                };
                 const ActionIcon = config.icon;
 
                 return (
