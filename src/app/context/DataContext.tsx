@@ -109,13 +109,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     try { return JSON.parse(localStorage.getItem(UPLOAD_KEY) || 'null') || defaultUpload; }
     catch { return defaultUpload; }
   });
-  const [staff, setStaff] = useState<StaffMember[]>(() => {
-    try { return JSON.parse(localStorage.getItem(STAFF_KEY) || '[]'); }
-    catch { return []; }
-  });
+  const [staff, setStaff] = useState<StaffMember[]>([]);
+
+  const fetchStaff = async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, name, email')
+      .eq('role', 'assignee')
+      .order('name');
+    if (data) setStaff(data as StaffMember[]);
+  };
 
   useEffect(() => { localStorage.setItem(UPLOAD_KEY, JSON.stringify(uploadStatus)); }, [uploadStatus]);
-  useEffect(() => { localStorage.setItem(STAFF_KEY, JSON.stringify(staff)); }, [staff]);
 
   const fetchItems = async () => {
     const { data } = await supabase.from('items').select('*').order('risk_score', { ascending: false });
@@ -133,7 +138,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const refreshData = async () => {
     setLoading(true);
-    await Promise.all([fetchItems(), fetchTasks()]);
+    await Promise.all([fetchItems(), fetchTasks(), fetchStaff()]);
     setLoading(false);
   };
 
@@ -219,10 +224,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addStaff = useCallback(async (member: StaffMember) => {
-    setStaff(prev => [...prev, member]);
+    // Profile already created via API route, just refetch
+    setStaff(prev => [...prev, member].sort((a, b) => a.name.localeCompare(b.name)));
   }, []);
 
   const removeStaff = useCallback(async (id: string) => {
+    // Auth user already deleted via API route, just refetch local state
     setStaff(prev => prev.filter(m => m.id !== id));
   }, []);
 
