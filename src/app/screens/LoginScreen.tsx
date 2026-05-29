@@ -13,10 +13,10 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (profile) {
-      if (profile.role === 'admin') navigate('/app/dashboard');
-      else navigate('/assignee/tasks');
+      if (profile.role === 'admin') navigate('/app/dashboard', { replace: true });
+      else navigate('/assignee/tasks', { replace: true });
     }
-  }, [profile, navigate]);
+  }, [profile?.id]);
 
   const handleSubmit = async () => {
     if (!email || !password) {
