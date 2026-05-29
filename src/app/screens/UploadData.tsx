@@ -31,7 +31,7 @@ function UploadCard({ title, description, exampleColumns, status, onFileSelect, 
     'error': { icon: XCircle, color: 'text-red-600', bg: 'bg-red-50', label: 'Error' },
   };
 
-  const config = statusConfig[status];
+  const config = statusConfig[status] || statusConfig['not-uploaded'];
   const StatusIcon = config.icon;
 
   return (
