@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, Leaf } from 'lucide-react';
@@ -10,6 +10,13 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      if (profile.role === 'admin') navigate('/app/dashboard');
+      else navigate('/assignee/tasks');
+    }
+  }, [profile, navigate]);
 
   const handleSubmit = async () => {
     if (!email || !password) {
@@ -26,12 +33,6 @@ export default function LoginScreen() {
     }
     setLoading(false);
   };
-
-  // Redirect after profile loads
-  if (profile) {
-    if (profile.role === 'admin') navigate('/app/dashboard');
-    else navigate('/assignee/tasks');
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-6">
